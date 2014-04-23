@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Snippets xmlns="http://schemas.microsoft.com/PowerShell/Snippets">
+  <Snippet Version="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>PSL Target ScriptBlock ( PoshLogger )</Title>
+      <Description>ScriptBlock to Define a New Logger Target</Description>
+      <Author>qawarrior</Author>
+    </Header>
+    <Code>
+      <Script Language="powershell" CaretOffset="294"><![CDATA[PSLTarget '<Target Name>' {
+    param(
+    [string]
+    $Level = 'Info',
+    [DateTime]
+    $DateTime = $( Get-Date ),
+    [string]
+    $Message = [string]::Empty,
+    [string]
+    $Context = 'NULL',
+    $PSLogger
+    )
+
+	#Add Log Target Logic Here such as Writing to  a database table, etc.
+}]]></Script>
+    </Code>
+  </Snippet>
+</Snippets>
