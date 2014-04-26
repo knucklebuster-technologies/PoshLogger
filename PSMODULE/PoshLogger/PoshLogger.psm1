@@ -29,7 +29,7 @@ Select-Object -ExpandProperty FullName |
 ForEach-Object { . "$_" }
 
 #add ise snippets when module is loaded
-if( Test-Path -Path Function:\Import-IseSnippet -ErrorAction SilentlyContinue ) {
+if( $Host.Name -eq 'Windows PowerShell ISE Host' ) {
     Import-IseSnippet -Path "$PSModuleRoot\Snippets"
 }
 
