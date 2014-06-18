@@ -30,11 +30,16 @@ function New-PSLInstance {
     New-Module -AsCustomObject -ArgumentList $Name, $Path, $TargetNames -ScriptBlock {
         
         #region define Members
+        #logger name
         $Name = "$( $args[0] )"
+        #log file object properties
         $FileInfo = New-Object System.IO.FileInfo -ArgumentList "$( Join-Path -Path $args[1] -ChildPath ( $Name + '.log' ))"
         $FileInfo.Create() | Out-Null
         $FilePath = $FileInfo.FullName
+        #collection of log targets to execute for each log message
         $Targets = New-Object System.Collections.Generic.List[ScriptBlock]
+        #observable collection for log message to queue up
+        $LogMessageCollection = New-Object System.Collections.ObjectModel.ObservableCollection[PSObject]
         #endregion
 
         #region Add Targets
@@ -49,6 +54,24 @@ function New-PSLInstance {
         }
         #endregion
 
+        #region setup event subscription and action
+        #each log call fires an event that processes async
+        $EventSubcription = Register-ObjectEvent -InputObject $LogMessageCollection -EventName CollectionChanged -SourceIdentifier LogMessageCollectionChanged -MessageData $Targets -Action {
+            if($Event.SourceEventArgs.Action -eq 'Add') {
+                $Sender = $Event.Sender
+                $Event.SourceEventArgs.NewItems |
+                ForEach-Object {
+                    $lm = $_
+                    $Event.MessageData |
+                    ForEach-Object {
+                        $sb = [ScriptBlock] $_
+                        $sb.Invoke($lm)
+                    }
+                }
+            }
+        }
+        #endregion setup event subscription and action
+        
         #region Public Functions
         function Debug {
             param(
