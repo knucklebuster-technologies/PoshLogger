@@ -1,4 +1,4 @@
-﻿PSLTarget 'LogFile' {
+﻿ipPSLTarget 'LogFile' {
     param(
     $Level,
     $DateTime,

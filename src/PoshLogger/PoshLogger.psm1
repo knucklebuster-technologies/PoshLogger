@@ -11,6 +11,12 @@ $PSModuleRoot = $PSScriptRoot
 $PSL_Defined_Targets = @{}
 $PSL_Logger_Instances = @{}
 
+#Define runspace pool for logging
+$PSL_ISessionState = [System.Management.Automation.Runspaces.InitialSessionState]::CreateDefault()
+$PSL_RunspacePool = [RunspaceFactory]::CreateRunspacePool(1, 25, $PSL_ISessionState, $Host)
+$PSL_RunspacePool.Open()
+$PSL_RunningRunspaces = @()
+
 #PSObject containing list of module members to export at loading
 $PUBLIC = New-Object psobject -Property @{
     'Function' = $( New-Object System.Collections.Generic.List[string]  )
@@ -19,12 +25,12 @@ $PUBLIC = New-Object psobject -Property @{
 }
 
 #dot source ps1 files into the modules execution context
-Get-ChildItem -Path "$PSModuleRoot\scripts" -Filter "*ps1" |
+Get-ChildItem -Path "$PSModuleRoot\scripts" -Filter '*ps1' |
 Select-Object -ExpandProperty FullName |
 ForEach-Object { . "$_" }
 
 #dot source Targets.ps1 files define in the targets directory
-Get-ChildItem -Path "$PSModuleRoot\targets" -Filter "*Target.ps1" |
+Get-ChildItem -Path "$PSModuleRoot\targets" -Filter '*Target.ps1' |
 Select-Object -ExpandProperty FullName |
 ForEach-Object { . "$_" }
 
